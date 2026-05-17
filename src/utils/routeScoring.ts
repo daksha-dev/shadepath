@@ -37,11 +37,12 @@ export const scoreRoutes = (
   profile: UserProfile,
   weather: UvWeather,
   departureOffsetMinutes: number,
+  baseDepartureHour?: number,
 ): ScoredRoute[] => {
   const speed = modeSpeedsKmh[mode]
   const exposure = bodyExposureFactor(mode, profile)
   const cloudFactor = cloudFactorFromCover(weather.cloudCover)
-  const uvNow = Math.max(weather.uvIndex, fallbackUv.uvIndex) * timeOfDayMultiplier(departureOffsetMinutes)
+  const uvNow = Math.max(weather.uvIndex, fallbackUv.uvIndex) * timeOfDayMultiplier(departureOffsetMinutes, baseDepartureHour)
   const demoDistanceMultiplier = 2.25
 
   const scored = routes.map((route) => {
@@ -99,10 +100,11 @@ export const safestDepartureInsight = (
   profile: UserProfile,
   weather: UvWeather,
   selectedRouteId: string,
+  baseDepartureHour?: number,
 ) => {
   const offsets = [0, 30, 60, 90, 120]
   const values = offsets.map((offset) => {
-    const route = scoreRoutes(routes, mode, profile, weather, offset).find((item) => item.id === selectedRouteId)
+    const route = scoreRoutes(routes, mode, profile, weather, offset, baseDepartureHour).find((item) => item.id === selectedRouteId)
     return { offset, dose: route?.totalDose ?? 0 }
   })
   return values.reduce((best, item) => (item.dose < best.dose ? item : best), values[0])

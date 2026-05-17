@@ -16,6 +16,8 @@ export type UvWeather = {
   source: 'Open-Meteo' | 'Demo'
 }
 
+export type UvTimeMode = 'live' | 'demo'
+
 export const fallbackUv: UvWeather = {
   uvIndex: 9.1,
   uvClearSky: 10.2,
@@ -25,8 +27,10 @@ export const fallbackUv: UvWeather = {
 
 export const cloudFactorFromCover = (cloudCover: number) => Math.max(0.62, 1 - cloudCover / 220)
 
-export const timeOfDayMultiplier = (departureOffsetMinutes: number) => {
-  const hour = 12.4 + departureOffsetMinutes / 60
+export const demoDepartureHour = 11.5
+
+export const timeOfDayMultiplier = (departureOffsetMinutes: number, baseHour = demoDepartureHour) => {
+  const hour = baseHour + departureOffsetMinutes / 60
   if (hour < 8) return 0.42
   if (hour < 10) return 0.68
   if (hour < 12) return 0.9

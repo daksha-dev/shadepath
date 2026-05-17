@@ -1,15 +1,17 @@
 import { Bike, Clock, Footprints, PersonStanding, Shield, Shirt, SunMedium } from 'lucide-react'
 import { journeys, modeLabels, type JourneyId, type Mode } from '../data/bangaloreRoutes'
-import type { UserProfile } from '../utils/uvDose'
+import type { UserProfile, UvTimeMode } from '../utils/uvDose'
 
 type Props = {
   journeyId: JourneyId
   mode: Mode
   departureOffset: number
+  timeMode: UvTimeMode
   profile: UserProfile
   onJourneyChange: (journeyId: JourneyId) => void
   onModeChange: (mode: Mode) => void
   onDepartureChange: (offset: number) => void
+  onTimeModeChange: (timeMode: UvTimeMode) => void
   onProfileChange: (profile: UserProfile) => void
   onAnalyze: () => void
 }
@@ -25,10 +27,12 @@ export function ProfileControls({
   journeyId,
   mode,
   departureOffset,
+  timeMode,
   profile,
   onJourneyChange,
   onModeChange,
   onDepartureChange,
+  onTimeModeChange,
   onProfileChange,
   onAnalyze,
 }: Props) {
@@ -83,6 +87,27 @@ export function ProfileControls({
 
       <div className="field">
         <span>
+          <Clock size={15} /> Time mode
+        </span>
+        <div className="segmented time-mode-toggle">
+          {([
+            ['demo', 'Demo Daytime'],
+            ['live', 'Live Time'],
+          ] as const).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={timeMode === value ? 'active' : ''}
+              onClick={() => onTimeModeChange(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="field">
+        <span>
           <Clock size={15} /> Departure
         </span>
         <input
@@ -94,8 +119,10 @@ export function ProfileControls({
           onChange={(event) => onDepartureChange(Number(event.target.value))}
         />
         <div className="range-labels">
-          <span>Now</span>
-          <strong>{departureOffset === 0 ? 'Leave now' : `+${departureOffset} min`}</strong>
+          <span>{timeMode === 'demo' ? '11:30 AM' : 'Now'}</span>
+          <strong>
+            {departureOffset === 0 ? (timeMode === 'demo' ? '11:30 AM' : 'Leave now') : `+${departureOffset} min`}
+          </strong>
           <span>+120</span>
         </div>
       </div>
