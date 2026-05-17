@@ -1,4 +1,4 @@
-import { modeSpeedsKmh, type Mode, type RouteOption, type Segment } from '../data/bangaloreRoutes'
+import { type Mode, type RouteOption, type Segment } from '../data/bangaloreRoutes'
 import {
   bodyExposureFactor,
   cloudFactorFromCover,
@@ -31,6 +31,19 @@ export type ScoredRoute = RouteOption & {
   scoredSegments: ScoredSegment[]
 }
 
+export const identifyRouteBenchmarks = (routes: ScoredRoute[]) => {
+  const fastestRoute = routes.reduce<ScoredRoute | undefined>(
+    (fastest, route) => (!fastest || route.etaMinutes < fastest.etaMinutes ? route : fastest),
+    undefined,
+  )
+  const lowestUvRoute = routes.reduce<ScoredRoute | undefined>(
+    (lowest, route) => (!lowest || route.totalDose < lowest.totalDose ? route : lowest),
+    undefined,
+  )
+
+  return { fastestRoute, lowestUvRoute }
+}
+
 export const scoreRoutes = (
   routes: RouteOption[],
   mode: Mode,
@@ -39,21 +52,18 @@ export const scoreRoutes = (
   departureOffsetMinutes: number,
   baseDepartureHour?: number,
 ): ScoredRoute[] => {
-  const speed = modeSpeedsKmh[mode]
   const exposure = bodyExposureFactor(mode, profile)
   const cloudFactor = cloudFactorFromCover(weather.cloudCover)
   const uvNow = Math.max(weather.uvIndex, fallbackUv.uvIndex) * timeOfDayMultiplier(departureOffsetMinutes, baseDepartureHour)
-  const demoDistanceMultiplier = 2.25
 
   const scored = routes.map((route) => {
-    const distanceKm = route.segments.reduce((sum, segment) => sum + segment.distanceKm * demoDistanceMultiplier, 0)
-    const etaMinutes = (distanceKm / speed) * 60
-    const weightedShade =
-      route.segments.reduce((sum, segment) => sum + segment.shadeFraction * segment.distanceKm * demoDistanceMultiplier, 0) / distanceKm
+    const distanceKm = route.demoDistanceKm
+    const etaMinutes = route.demoEtaMinutes
+    const segmentDistanceKm = route.segments.reduce((sum, segment) => sum + segment.distanceKm, 0)
 
     const scoredSegments = route.segments.map((segment) => {
-      const minutes = ((segment.distanceKm * demoDistanceMultiplier) / speed) * 60
-      const dose = segmentDose(uvNow, cloudFactor, segment.shadeFraction, exposure, minutes)
+      const minutes = segmentDistanceKm ? (segment.distanceKm / segmentDistanceKm) * etaMinutes : etaMinutes / route.segments.length
+      const dose = segmentDose(uvNow, cloudFactor, segment.shadeFraction, exposure, minutes) * route.uvDoseMultiplier
       const dosePerMinute = dose / minutes
       return {
         ...segment,
@@ -66,7 +76,7 @@ export const scoreRoutes = (
 
     const totalDose = scoredSegments.reduce((sum, segment) => sum + segment.dose, 0)
     const peakEffectiveUv = Math.max(
-      ...route.segments.map((segment) => effectiveUv(uvNow, cloudFactor, segment.shadeFraction, exposure)),
+      ...route.segments.map((segment) => effectiveUv(uvNow, cloudFactor, segment.shadeFraction, exposure) * route.uvDoseMultiplier),
     )
 
     return {
@@ -75,7 +85,7 @@ export const scoreRoutes = (
       etaMinutes,
       totalDose,
       grade: gradeForDose(totalDose),
-      shadedPercent: weightedShade * 100,
+      shadedPercent: route.demoShadeFraction * 100,
       exposureSaved: 0,
       exposureSavedPercent: 0,
       peakEffectiveUv,
@@ -83,7 +93,8 @@ export const scoreRoutes = (
     }
   })
 
-  const fastestDose = scored.find((route) => route.id === 'fastest')?.totalDose ?? scored[0]?.totalDose ?? 0
+  const { fastestRoute, lowestUvRoute } = identifyRouteBenchmarks(scored)
+  const fastestDose = fastestRoute?.totalDose ?? scored[0]?.totalDose ?? 0
 
   return scored
     .map((route) => ({
@@ -91,7 +102,7 @@ export const scoreRoutes = (
       exposureSaved: Math.max(0, fastestDose - route.totalDose),
       exposureSavedPercent: fastestDose ? Math.max(0, ((fastestDose - route.totalDose) / fastestDose) * 100) : 0,
     }))
-    .sort((a, b) => a.totalDose - b.totalDose)
+    .sort((a, b) => a.totalDose - b.totalDose || (a.id === lowestUvRoute?.id ? -1 : b.id === lowestUvRoute?.id ? 1 : 0))
 }
 
 export const safestDepartureInsight = (

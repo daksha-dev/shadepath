@@ -331,9 +331,15 @@ input[type='range'] {
   gap: 2px;
 }
 
-.recommendation-banner span {
+.recommendation-banner span,
+.recommendation-banner small {
   color: #43614d;
   font-size: 0.9rem;
+}
+
+.recommendation-banner small {
+  display: block;
+  max-width: 820px;
 }
 
 .map-shell,

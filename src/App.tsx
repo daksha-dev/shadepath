@@ -131,6 +131,10 @@ function App() {
                     ? `Leaving ${departureOffset} minutes later reduces estimated UV dose by ${Math.round(departureSavings)}%.`
                     : `Current route saves ${Math.round(selectedRoute.exposureSaved)} UVI-min versus the fastest option.`}
                 </span>
+                <small>
+                  The fastest route is not always the safest route. ArkaWay recommends a route that trades a few extra minutes for lower UV
+                  exposure.
+                </small>
               </div>
             </motion.div>
 
