@@ -1,8 +1,8 @@
-# ShadePath
+# ArkaWay
 
-ShadePath is a frontend-only hackathon proof-of-concept that demonstrates UV-dose-aware route ranking for two-wheeler commuters in Bengaluru.
+ArkaWay is a frontend-only hackathon proof-of-concept that demonstrates UV-dose-aware route ranking for two-wheeler commuters in Bengaluru.
 
-Instead of showing only city-level UV Index, ShadePath estimates route-level UV dose by combining:
+Instead of showing only city-level UV Index, ArkaWay estimates route-level UV dose by combining:
 
 - UV Index from Open-Meteo, with demo fallback data
 - Route travel time

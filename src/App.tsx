@@ -68,7 +68,7 @@ function App() {
         <div className="brand-block">
           <div className="brand-mark"><SunMedium size={27} /></div>
           <div>
-            <p className="eyebrow">ShadePath</p>
+            <p className="eyebrow">ArkaWay</p>
             <h1>UV-dose-aware routing for Bengaluru commuters</h1>
           </div>
         </div>
