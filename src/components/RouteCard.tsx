@@ -10,7 +10,7 @@ type Props = {
 
 export function RouteCard({ route, selected, rank, onSelect }: Props) {
   return (
-    <button className={`route-card ${selected ? 'selected' : ''}`} type="button" onClick={onSelect}>
+    <button className={`route-card${rank === 1 ? ' recommended' : ''}${selected ? ' selected' : ''}`} type="button" onClick={onSelect}>
       <div className="route-card-top">
         <div>
           <span className="rank">#{rank}</span>
