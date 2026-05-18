@@ -13,7 +13,7 @@ export function RouteCard({ route, selected, rank, onSelect }: Props) {
       <div className="route-rank tabular">{(rank).toString().padStart(2, '0')}</div>
       <div style={{ textAlign: 'left' }}>
         <h3>{route.label}</h3>
-        <p>{Math.round(route.exposureSavedPercent)}% saved · {Math.round(route.shadedPercent)}% shade</p>
+        <p><span style={{ color: 'var(--moss)' }}>{Math.round(route.exposureSavedPercent)}% saved</span> · {Math.round(route.shadedPercent)}% shade</p>
       </div>
       <div className="route-metrics">
         <span className="dose tabular">{Math.round(route.totalDose)} UVI-min</span>

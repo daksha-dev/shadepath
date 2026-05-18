@@ -5,6 +5,7 @@ import { CityRiskLayers } from './components/CityRiskLayers'
 import { CityRiskPanel } from './components/CityRiskPanel'
 import { ExposureTracker } from './components/ExposureTracker'
 import { FleetDashboard } from './components/FleetDashboard'
+import { FleetDashboardLayers } from './components/FleetDashboardLayers'
 import { GearRecommendation } from './components/GearRecommendation'
 import { PlannerLayers } from './components/PlannerLayers'
 import { ProfileControls } from './components/ProfileControls'
@@ -34,6 +35,7 @@ function App() {
   const [profile, setProfile] = useState<UserProfile>(initialProfile)
   const [weather, setWeather] = useState<UvWeather>(fallbackUv)
   const [selectedRouteId, setSelectedRouteId] = useState('lowestUv')
+  const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null)
 
   useEffect(() => {
     fetchBengaluruUv(timeMode).then(setWeather)
@@ -83,6 +85,7 @@ function App() {
             />
           )}
           {activeTab === 'areas' && <CityRiskLayers />}
+          {activeTab === 'fleet' && <FleetDashboardLayers hoveredHotspot={hoveredHotspot} />}
         </MapContainer>
       </div>
 
@@ -126,9 +129,42 @@ function App() {
               onAnalyze={() => {}}
             />
 
-            <div className="col-span-3 route-grid" style={{ pointerEvents: 'auto' }}>
-              <div className="panel" style={{ marginBottom: '24px' }}>
-                <p className="label" style={{ color: 'var(--moss)' }}>Recommendation</p>
+            {/* Grid spacer / container for floating routes card */}
+            <div className="col-span-3" style={{ position: 'relative', height: 'calc(100vh - 48px)', pointerEvents: 'none' }}>
+              <div className="panel" style={{ 
+                position: 'absolute', 
+                bottom: 0, 
+                left: 0, 
+                width: '100%', 
+                padding: 0, 
+                pointerEvents: 'auto',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 12px 32px rgba(31, 78, 121, 0.2)',
+                backdropFilter: 'blur(8px)',
+                backgroundColor: 'rgba(250, 250, 247, 0.85)'
+              }}>
+                <div className="route-grid">
+                  {routes.map((route, index) => (
+                    <RouteCard
+                      key={route.id}
+                      route={route}
+                      selected={selectedRoute.id === route.id}
+                      rank={index + 1}
+                      onSelect={() => setSelectedRouteId(route.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Empty space in the center (columns 7-9) for map visibility */}
+            <div className="col-span-3" style={{ pointerEvents: 'none' }}></div>
+
+            {/* Right Column Stack (columns 10-12) */}
+            <div className="col-span-3 scrollable-col" style={{ display: 'flex', flexDirection: 'column', gap: '24px', pointerEvents: 'auto', width: '90%', justifySelf: 'start' }}>
+              <div className="panel right-card">
+                <p className="label" style={{ color: 'var(--cobalt)' }}>Recommendation</p>
                 <div style={{ marginTop: '8px' }}>
                   <strong style={{ fontSize: '0.875rem' }}>{selectedRoute.label} is safest. </strong>
                   <span style={{ fontSize: '0.875rem', color: 'var(--slate)' }}>
@@ -142,18 +178,6 @@ function App() {
                 </p>
               </div>
 
-              {routes.map((route, index) => (
-                <RouteCard
-                  key={route.id}
-                  route={route}
-                  selected={selectedRoute.id === route.id}
-                  rank={index + 1}
-                  onSelect={() => setSelectedRouteId(route.id)}
-                />
-              ))}
-            </div>
-
-            <div className="col-span-3" style={{ display: 'flex', flexDirection: 'column', gap: '24px', pointerEvents: 'auto' }}>
               <ExposureTracker route={selectedRoute} safestOffset={safest.offset} />
               <GearRecommendation route={selectedRoute} mode={mode} profile={profile} />
             </div>
@@ -162,7 +186,7 @@ function App() {
 
         {activeTab === 'areas' && <CityRiskPanel />}
 
-        {activeTab === 'fleet' && <FleetDashboard />}
+        {activeTab === 'fleet' && <FleetDashboard onHoverHotspot={setHoveredHotspot} />}
       </main>
     </div>
   )

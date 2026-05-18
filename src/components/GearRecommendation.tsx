@@ -15,10 +15,10 @@ export function GearRecommendation({ route, mode, profile }: Props) {
   const needsVisor = route.peakEffectiveUv > 4.5 || !profile.helmet
 
   return (
-    <section className="panel">
+    <section className="panel right-card">
       <div>
         <p className="label">Gear recommendation</p>
-        <h2>Peak UVI {route.peakEffectiveUv.toFixed(1)}</h2>
+        <h2 style={{ color: 'var(--cobalt)' }}>Peak UVI {route.peakEffectiveUv.toFixed(1)}</h2>
       </div>
       <p style={{ fontSize: '0.875rem' }}>
         For a {Math.round(route.etaMinutes)}-minute {modeLabels[mode].toLowerCase()} ride.

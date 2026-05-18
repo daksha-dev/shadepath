@@ -11,10 +11,10 @@ export function ExposureTracker({ route, safestOffset }: Props) {
   const streak = Math.max(4, Math.round(6 + route.exposureSavedPercent / 14))
 
   return (
-    <section className="panel">
+    <section className="panel right-card">
       <div>
         <p className="label">Exposure tracker</p>
-        <h2>{avoided} UVI-min avoided today</h2>
+        <h2 style={{ color: avoided > 0 ? 'var(--moss)' : 'var(--cobalt)' }}>{avoided} UVI-min avoided today</h2>
       </div>
       <div className="data-grid">
         <div className="data-block safe">

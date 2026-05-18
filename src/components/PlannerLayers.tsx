@@ -31,8 +31,8 @@ export function PlannerLayers({ journey, routes, selectedRouteId, onSelectRoute 
             key={`${route.id}-${segment.id}`}
             positions={segment.coords}
             pathOptions={{
-              color: riskColors[segment.risk],
-              weight: selectedRouteId === route.id ? 6 : 3,
+              color: selectedRouteId === route.id ? '#1F4E79' : riskColors[segment.risk],
+              weight: selectedRouteId === route.id ? 9 : 3,
               opacity: selectedRouteId === route.id ? 1 : 0.4,
               className: 'animated-route', // Let's add a CSS class to animate if possible
             }}
