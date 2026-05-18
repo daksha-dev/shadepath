@@ -1,1022 +1,492 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');
+
 * {
   box-sizing: border-box;
 }
 
 :root {
   font-size: 16px;
-  color: #2C2C2C;
-  background: #FDFAF4;
-  font-family: Inter, Manrope, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  
+  /* Clinical Cartography Tokens */
+  --paper:     #FAFAF7;
+  --graphite:  #1B1B1A;
+  --slate:     #5C5C58;
+  --hairline:  #E4E2DC;
+  --cobalt:    #1F4E79;
+  --signal:    #D6362A;
+  --moss:      #4B6B3C;
+  --cobalt-soft: rgba(31, 78, 121, 0.08);
+
+  font-family: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-
-  /* Brand palette */
-  --amber:        #F4A93C;
-  --amber-soft:   #FCE7C0;
-  --amber-glow:   rgba(244, 169, 60, 0.08);
-  --teal:         #5BA89C;
-  --teal-soft:    #D7ECE8;
-  --teal-glow:    rgba(91, 168, 156, 0.08);
-  --navy:         #1A2B4A;
-  --charcoal:     #2C2C2C;
-  --muted:        #6B6B6B;
-  --page:         #FDFAF4;
-  --card:         #FFFFFF;
-  --line:         #FCE7C0;
-  --line-strong:  #F0DFB8;
-
-  /* Risk scale: teal (safe) → amber (caution) → burnt-red (danger) */
-  /* MapView polyline pathOptions must match: low=#5BA89C  medium=#F4A93C  high=#E05A2B */
-  --risk-low:     #5BA89C;
-  --risk-medium:  #F4A93C;
-  --risk-high:    #E05A2B;
-
-  /* Grade badge scale */
-  --grade-a: #5BA89C;
-  --grade-b: #7BBFB5;
-  --grade-c: #F4A93C;
-  --grade-d: #E07A2B;
-  --grade-f: #D94F35;
-
-  --shadow:       0 18px 45px rgba(26, 43, 74, 0.07);
-  --shadow-hover: 0 22px 54px rgba(26, 43, 74, 0.12);
-  --radius-lg: 24px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
+  -moz-osx-font-smoothing: grayscale;
+  
+  color: var(--graphite);
+  background: var(--paper);
 }
 
 body {
   margin: 0;
   min-width: 320px;
+  overflow: hidden; /* App shell will manage layout */
 }
 
-button,
-select,
-input {
+/* Typography Rules */
+h1, h2, h3, h4, p {
+  margin: 0;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--graphite);
+}
+
+p, span, div {
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.label, label, .eyebrow {
+  font-weight: 500;
+  color: var(--slate);
+  font-size: 0.8125rem; /* 13px */
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-family: 'Geist', 'Inter', monospace;
+}
+
+/* Base elements */
+button, select, input {
   font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
 }
 
 button {
   cursor: pointer;
 }
 
-h1,
-h2,
-h3,
-p {
-  margin: 0;
+/* Resets & Anti-patterns */
+img, svg {
+  display: block;
 }
 
-h1 {
-  letter-spacing: -0.02em;
-}
-
+/* App Layout: Map background, floating UI */
 .app-shell {
-  min-height: 100vh;
-  padding: 22px;
-  background:
-    radial-gradient(circle at 7% 5%, var(--amber-glow), transparent 32%),
-    radial-gradient(circle at 92% 0%, var(--teal-glow), transparent 32%),
-    var(--page);
-}
-
-/* ─── Header ─────────────────────────────────────────────── */
-
-.app-header {
   position: relative;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 138px;
-  padding: 24px 26px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-lg);
-  color: white;
-  background: var(--navy);
-  box-shadow: 0 24px 60px rgba(26, 43, 74, 0.22);
 }
 
-.app-header::after {
+/* The Map */
+.map-background {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  content: "";
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.36), rgba(0, 0, 0, 0.07));
+  z-index: 0;
+}
+.leaflet-container {
+  background: var(--paper) !important;
+  font-family: inherit;
+}
+.leaflet-control-attribution {
+  display: none;
 }
 
-.brand-block,
-.header-metrics,
-.tabs,
-.card-heading,
-.panel-title,
-.fleet-stat-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.brand-block,
-.header-metrics {
+/* Vertical Dock Navigation */
+.dock {
   position: relative;
-  z-index: 1;
+  z-index: 20;
+  width: 64px;
+  height: 100vh;
+  border-right: 1px solid var(--hairline);
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 24px;
 }
 
 .brand-mark {
+  color: var(--cobalt);
+  margin-bottom: 16px;
+}
+
+.dock-button {
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
-  width: 58px;
-  height: 58px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 17px;
-  color: white;
-  background: linear-gradient(135deg, var(--amber), #E09830);
-  box-shadow: inset 0 -8px 16px rgba(26, 43, 74, 0.14), 0 12px 26px rgba(0, 0, 0, 0.18);
+  border-radius: 2px;
+  color: var(--slate);
+  transition: all 150ms ease-out;
 }
 
-.eyebrow {
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 850;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+.dock-button:hover {
+  color: var(--graphite);
+  background: var(--cobalt-soft);
 }
 
-.app-header .eyebrow {
-  color: var(--amber);
+.dock-button.active {
+  color: var(--paper);
+  background: var(--cobalt);
 }
 
-.app-header h1 {
-  max-width: 740px;
-  color: #FDFAF4;
-  font-size: clamp(1.55rem, 3.1vw, 2.85rem);
-  font-weight: 850;
-  line-height: 1.04;
-}
-
-.header-metrics {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  max-width: 430px;
-}
-
-.header-metrics span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  color: rgba(253, 250, 244, 0.9);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-/* UV index chip: amber bg, navy text */
-.header-metrics span:first-child {
-  color: var(--navy);
-  background: var(--amber);
-  border-color: rgba(244, 169, 60, 0.7);
-  font-weight: 850;
-}
-
-/* ─── Tabs ────────────────────────────────────────────────── */
-
-.tabs {
-  margin: 16px 0 18px;
-  padding: 5px;
-  width: fit-content;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--card);
-  box-shadow: 0 10px 28px rgba(26, 43, 74, 0.06);
-}
-
-.tabs button,
-.segmented button,
-.mode-grid button {
-  border: 0;
-  color: var(--charcoal);
-  background: transparent;
-}
-
-.tabs button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 10px 15px;
-  border-radius: 999px;
-  font-weight: 800;
-  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
-}
-
-.tabs button:hover {
-  color: var(--navy);
-  background: var(--amber-soft);
-}
-
-.tabs button.active,
-.segmented button.active,
-.mode-grid button.active {
-  color: var(--navy);
-  background: linear-gradient(135deg, var(--amber), #F0A030);
-  box-shadow: inset 0 0 0 1px rgba(26, 43, 74, 0.08), 0 8px 18px rgba(244, 169, 60, 0.18);
-}
-
-/* ─── Layout ──────────────────────────────────────────────── */
-
-.planner-layout {
+/* UI Panel Container */
+.ui-layer {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  padding: 24px;
+  pointer-events: none; /* Let clicks pass through to map by default */
   display: grid;
-  grid-template-columns: minmax(280px, 330px) minmax(430px, 1fr) minmax(285px, 340px);
-  gap: 18px;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
   align-items: start;
 }
 
-.control-panel,
-.right-rail,
-.main-dashboard,
-.city-side-panel,
-.fleet-card,
-.fleet-hero {
-  border: 1px solid var(--teal-soft);
-  border-radius: var(--radius-lg);
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-
-.control-panel,
-.right-rail {
+/* Floating Panels */
+.panel {
+  pointer-events: auto; /* Catch clicks for UI */
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 20px;
 }
 
-.control-panel h2,
-.city-side-panel h2,
-.fleet-hero h2 {
-  color: var(--navy);
-  font-size: 1.32rem;
-  line-height: 1.14;
+/* Layout Utilities */
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
+.col-span-8 { grid-column: span 8; }
+.col-span-9 { grid-column: span 9; }
+
+/* Components */
+
+/* Inputs & Selects */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* ─── Form fields ─────────────────────────────────────────── */
-
-.field {
-  display: grid;
-  gap: 8px;
+.select-base {
+  width: 100%;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  color: var(--graphite);
+  font-weight: 500;
+  appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%231B1B1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>') no-repeat right center;
+  transition: border-color 150ms ease-out;
 }
 
-.field > span,
-.inline-setting span {
+.select-base:focus {
+  outline: none;
+  border-bottom-color: var(--cobalt);
+}
+
+/* Buttons */
+.btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  color: var(--navy);
-  font-size: 0.88rem;
-  font-weight: 800;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid var(--graphite);
+  background: var(--paper);
+  color: var(--graphite);
+  font-weight: 500;
+  border-radius: 2px;
+  transition: all 150ms ease-out;
+  min-height: 36px;
 }
 
-select {
-  width: 100%;
-  min-height: 44px;
-  padding: 11px 38px 11px 13px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  color: var(--navy);
-  background:
-    linear-gradient(45deg, transparent 50%, var(--navy) 50%) calc(100% - 18px) 52% / 7px 7px no-repeat,
-    var(--card);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  appearance: none;
+.btn:hover {
+  background: var(--graphite);
+  color: var(--paper);
 }
 
-select:focus,
-input[type='range']:focus-visible,
-button:focus-visible {
-  outline: 3px solid rgba(244, 169, 60, 0.45);
-  outline-offset: 2px;
+/* Mode toggles (Square) */
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: -1px; /* Overlap borders */
 }
 
+.mode-grid button {
+  border: 1px solid var(--hairline);
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--slate);
+  transition: all 150ms ease-out;
+  margin-right: -1px;
+}
+
+.mode-grid button:last-child {
+  margin-right: 0;
+}
+
+.mode-grid button:hover {
+  color: var(--graphite);
+  background: var(--cobalt-soft);
+}
+
+.mode-grid button.active {
+  color: var(--cobalt);
+  border-color: var(--cobalt);
+  z-index: 1; /* Bring active border to front */
+}
+
+/* Range Slider */
 input[type='range'] {
+  -webkit-appearance: none;
   width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  accent-color: var(--teal);
-  background: var(--amber-soft);
+  height: 2px;
+  background: var(--hairline);
+  margin: 16px 0;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--cobalt);
+  border-radius: 2px;
+  cursor: pointer;
 }
 
 .range-labels {
   display: flex;
   justify-content: space-between;
-  color: var(--muted);
-  font-size: 0.78rem;
+  color: var(--slate);
+  font-size: 0.8125rem;
 }
-
 .range-labels strong {
-  color: var(--navy);
+  color: var(--graphite);
+  font-weight: 500;
 }
 
-/* ─── Mode grid & segmented ───────────────────────────────── */
-
-.mode-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.mode-grid button,
-.segmented button {
-  min-height: 40px;
-  border-radius: var(--radius-sm);
-  background: #F5F0E8;
-  transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
-}
-
-.mode-grid button:hover,
-.segmented button:hover {
-  transform: translateY(-1px);
-  background: var(--amber-soft);
-}
-
-.mode-grid button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 8px;
-  font-size: 0.82rem;
-  font-weight: 850;
-}
-
-.segmented {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  gap: 7px;
-}
-
-.segmented button {
-  padding: 8px 10px;
-  text-transform: capitalize;
-}
-
-.time-mode-toggle button {
-  text-transform: none;
-}
-
-/* ─── Inline settings / toggle ────────────────────────────── */
-
-.inline-setting {
+/* Route Cards */
+.route-grid {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 46px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: #FFFAF3;
+  flex-direction: column;
+  gap: -1px; /* Overlap borders */
 }
 
-.toggle {
-  position: relative;
-  width: 56px;
-  height: 31px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: #E8E2D4;
-  transition: background 160ms ease, border-color 160ms ease;
-}
-
-.toggle i {
-  position: absolute;
-  top: 4px;
-  left: 5px;
-  width: 21px;
-  height: 21px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 4px 10px rgba(26, 43, 74, 0.16);
-  transition: transform 160ms ease;
-}
-
-/* Active toggle: teal = protective/safe */
-.toggle.active {
-  border-color: rgba(91, 168, 156, 0.45);
-  background: var(--teal);
-}
-
-.toggle.active i {
-  transform: translateX(23px);
-}
-
-/* ─── Primary CTA ─────────────────────────────────────────── */
-
-.primary-action {
-  min-height: 50px;
-  border: 0;
-  border-radius: 15px;
-  color: var(--navy);
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--amber), #E09830);
-  box-shadow: 0 16px 32px rgba(244, 169, 60, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.primary-action:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 20px 40px rgba(244, 169, 60, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-}
-
-/* ─── Main dashboard ──────────────────────────────────────── */
-
-.main-dashboard {
-  min-width: 0;
-  padding: 16px;
-}
-
-/* ─── Recommendation banner ───────────────────────────────── */
-
-.recommendation-banner {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  padding: 15px 16px;
-  margin-bottom: 14px;
-  border: 1px solid rgba(244, 169, 60, 0.18);
-  border-radius: var(--radius-md);
-  color: var(--navy);
-  background: var(--amber-soft);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.recommendation-banner > svg {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  padding: 8px;
-  border-radius: 12px;
-  color: var(--navy);
-  background: var(--amber);
-}
-
-.recommendation-banner div {
+.route-row {
   display: grid;
-  gap: 3px;
-}
-
-.recommendation-banner span,
-.recommendation-banner small {
-  color: var(--charcoal);
-  font-size: 0.9rem;
-}
-
-.recommendation-banner small {
-  display: block;
-  max-width: 820px;
-}
-
-/* ─── Map shell ───────────────────────────────────────────── */
-
-.map-shell,
-.city-map-card {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--card);
-  box-shadow: inset 0 0 0 8px rgba(253, 250, 244, 0.5);
-}
-
-.map {
-  width: 100%;
-  height: 430px;
-}
-
-.leaflet-container {
-  background: #EBE7DC;
-  font-family: inherit;
-}
-
-/* ─── Map legend ──────────────────────────────────────────── */
-/* Keep polyline pathOptions in MapView.tsx in sync:
-   low    → #5BA89C  (--risk-low)
-   medium → #F4A93C  (--risk-medium)
-   high   → #E05A2B  (--risk-high)   */
-
-.map-legend {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  z-index: 500;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  max-width: min(94%, 520px);
-  padding: 9px;
-  border: 1px solid rgba(252, 231, 192, 0.9);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 14px 28px rgba(26, 43, 74, 0.11);
-}
-
-.map-legend span {
-  display: inline-flex;
+  grid-template-columns: 32px 1fr auto;
   align-items: center;
-  gap: 6px;
-  color: var(--navy);
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.map-legend i {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.risk-low {
-  background: var(--risk-low);
-}
-
-.risk-medium {
-  background: var(--risk-medium);
-}
-
-.risk-high {
-  background: var(--risk-high);
-}
-
-/* ─── Route cards ─────────────────────────────────────────── */
-
-.route-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 12px;
-  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--hairline);
+  cursor: pointer;
+  transition: all 150ms ease-out;
+  background: var(--paper);
+  margin-bottom: -1px;
 }
 
-.route-card {
-  position: relative;
-  display: grid;
-  gap: 13px;
-  padding: 15px;
-  overflow: hidden;
-  border: 1px solid var(--teal-soft);
-  border-radius: var(--radius-md);
-  text-align: left;
-  color: var(--charcoal);
-  background: var(--card);
-  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+.route-row:hover {
+  background: var(--cobalt-soft);
 }
 
-/* Recommended (#1 rank): 3px amber top strip */
-.route-card.recommended {
-  border-top: 3px solid var(--amber);
+.route-row.selected {
+  border-color: var(--cobalt);
+  z-index: 1;
 }
 
-.route-card:hover,
-.route-card.selected {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+.route-rank {
+  font-weight: 600;
+  color: var(--slate);
+  font-size: 0.8125rem;
 }
 
-/* Selected: 2px amber ring */
-.route-card.selected::before {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  content: "";
-  border: 2px solid var(--amber);
-  border-radius: inherit;
+.route-row h3 {
+  font-size: 0.875rem; /* 14px */
+}
+.route-row p {
+  font-size: 0.8125rem;
+  color: var(--slate);
 }
 
-.route-card-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-/* Rank pill: amber-soft bg, navy text */
-.rank {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 34px;
-  height: 25px;
-  margin-bottom: 8px;
-  border-radius: 999px;
-  color: var(--navy);
-  font-size: 0.75rem;
-  font-weight: 950;
-  background: var(--amber-soft);
-}
-
-.route-card h3,
-.insight-card h3,
-.fleet-card h3 {
-  color: var(--navy);
-  font-size: 1rem;
-  line-height: 1.2;
-}
-
-.route-card p,
-.recommendation-copy,
-.simulation-card p,
-footer {
-  color: var(--muted);
-  font-size: 0.86rem;
-  line-height: 1.5;
-}
-
-/* Grade badges — UV risk spectrum */
-.grade {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 43px;
-  height: 43px;
-  border-radius: 15px;
-  color: white;
-  font-weight: 950;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.grade-a { background: var(--grade-a); }
-.grade-b { background: var(--grade-b); }
-.grade-c { background: var(--grade-c); color: var(--navy); }
-.grade-d { background: var(--grade-d); }
-.grade-f { background: var(--grade-f); }
-
-/* Metric chips: F5F0E8 bg, teal icon color */
 .route-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.route-metrics span,
-.saved-line,
-.tracker-grid span,
-.recommendation-grid span,
-.fleet-stat-row span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--charcoal);
-  font-size: 0.82rem;
-}
-
-.route-metrics span {
-  min-height: 34px;
-  padding: 8px;
-  border-radius: 11px;
-  background: #F5F0E8;
-  color: var(--teal);
-}
-
-.saved-line {
-  padding-top: 10px;
-  border-top: 1px dashed var(--line-strong);
-  color: var(--charcoal);
-}
-
-.saved-line strong {
-  color: var(--navy);
-}
-
-/* ─── Right rail ──────────────────────────────────────────── */
-
-.right-rail {
-  min-width: 0;
-}
-
-/* ─── UV card ─────────────────────────────────────────────── */
-
-.uv-card,
-.insight-card {
-  padding: 16px;
-  border: 1px solid var(--teal-soft);
-  border-radius: var(--radius-md);
-  background: var(--card);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-/* UV card: white with subtle amber glow top-right */
-.uv-card {
-  background:
-    radial-gradient(circle at 92% 8%, rgba(244, 169, 60, 0.12), transparent 32%),
-    var(--card);
-}
-
-/* UV number: amber (always high in demo) */
-.uv-number {
-  margin: 8px 0 6px;
-  color: var(--amber);
-  font-size: 3.35rem;
-  font-weight: 950;
-  letter-spacing: 0;
-  line-height: 0.94;
-}
-
-.uv-card span,
-.uv-card small {
-  display: block;
-  color: var(--muted);
-  font-size: 0.88rem;
-  line-height: 1.45;
-}
-
-.uv-card .uv-disclaimer {
-  margin-top: 10px;
-  color: var(--navy);
-  font-weight: 750;
-}
-
-.uv-card small {
-  margin-top: 10px;
-}
-
-/* ─── Gear + Tracker cards ────────────────────────────────── */
-
-.gear-card,
-.tracker-card {
-  display: grid;
-  gap: 13px;
-}
-
-/* Icon circle: teal-soft bg, teal icon */
-.card-heading > svg,
-.panel-title > svg {
-  flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
-  padding: 9px;
-  border-radius: 13px;
-  color: var(--teal);
-  background: var(--teal-soft);
-}
-
-.recommendation-grid,
-.tracker-grid {
-  display: grid;
-  gap: 9px;
-}
-
-.recommendation-grid {
-  grid-template-columns: 1fr 1fr;
-}
-
-.recommendation-grid span,
-.tracker-grid span {
-  min-height: 42px;
-  padding: 10px;
-  border: 1px solid var(--teal-soft);
-  border-radius: var(--radius-sm);
-  background: var(--card);
-  color: var(--charcoal);
-}
-
-/* ─── City risk map ───────────────────────────────────────── */
-
-.city-risk-layout {
-  display: grid;
-  grid-template-columns: minmax(420px, 1fr) minmax(300px, 380px);
-  gap: 18px;
-}
-
-.city-map-card .map {
-  height: 640px;
-}
-
-.city-side-panel {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-  padding: 20px;
-}
-
-.city-list {
-  display: grid;
-  gap: 8px;
-  padding: 15px;
-  border: 1px solid var(--teal-soft);
-  border-radius: var(--radius-md);
-  background: var(--card);
-}
-
-.city-list h3 {
+  text-align: right;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--navy);
-  font-size: 1rem;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.route-metrics .dose {
+  font-weight: 600;
+  color: var(--graphite);
+}
+.route-metrics .time {
+  color: var(--slate);
+  font-size: 0.8125rem;
 }
 
-/* Action list items */
-.city-list span {
-  padding: 10px 11px;
-  border-radius: var(--radius-sm);
-  color: var(--navy);
-  background: #EEF4FF;
-}
-
-/* Danger list items */
-.city-list.danger span {
-  color: #C0431A;
-  background: #FFF0E8;
-}
-
-/* Safe list items */
-.city-list.safe span {
-  color: #2D7A70;
-  background: #D7ECE8;
-}
-
-/* ─── Fleet dashboard ─────────────────────────────────────── */
-
-.fleet-layout {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 18px;
-}
-
-/* Fleet hero: white card with amber chip accents */
-.fleet-hero {
-  grid-column: 1 / -1;
+/* Toggles (Square thumb, thin track) */
+.setting-row {
   display: flex;
   justify-content: space-between;
-  gap: 24px;
-  padding: 22px;
-}
-
-.fleet-stat-row {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.fleet-stat-row span {
-  padding: 12px 13px;
-  border: 1px solid var(--amber-soft);
-  border-radius: var(--radius-sm);
-  background: var(--amber-soft);
-  color: var(--navy);
-}
-
-.fleet-card {
-  padding: 20px;
-}
-
-.chart-card {
-  min-height: 360px;
-}
-
-.hotspots-card,
-.simulation-card {
-  display: grid;
-  gap: 14px;
-}
-
-.hotspot-row {
-  display: grid;
-  grid-template-columns: 30px 1fr;
-  gap: 10px;
   align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline);
 }
 
-.hotspot-row span {
+.setting-row:last-child {
+  border-bottom: 0;
+}
+
+.square-toggle {
+  position: relative;
+  width: 32px;
+  height: 16px;
+  background: var(--hairline);
+  transition: background 150ms ease-out;
+}
+.square-toggle::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: var(--paper);
+  border: 1px solid var(--slate);
+  border-radius: 2px;
+  transition: transform 150ms ease-out, border-color 150ms ease-out;
+}
+
+.square-toggle.active {
+  background: var(--cobalt-soft);
+}
+.square-toggle.active::after {
+  transform: translateX(12px);
+  border-color: var(--cobalt);
+}
+
+/* Data blocks / Tracking */
+.data-grid {
   display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  color: white;
-  background: var(--navy);
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-/* Hotspot bars: burnt-red → amber gradient */
-.hotspot-row i {
-  grid-column: 2;
-  height: 8px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #E05A2B, var(--amber));
+.data-block p.label {
+  margin-bottom: 4px;
+}
+.data-block .value {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--graphite);
 }
 
-/* Simulation card: navy bg, amber accent, white body */
-.simulation-card {
-  align-content: center;
-  color: white;
-  background: var(--navy);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.data-block.danger .value {
+  color: var(--signal);
+}
+.data-block.safe .value {
+  color: var(--moss);
 }
 
-.simulation-card h3 {
-  color: var(--amber);
+/* Data List (City Risk) */
+.data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.data-list-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 0.875rem;
+}
+.data-list-item:last-child {
+  border-bottom: 0;
+}
+.data-list-item .rank {
+  color: var(--slate);
+  width: 20px;
+}
+.data-list-item .name {
+  flex: 1;
+  font-weight: 500;
 }
 
-.simulation-card p {
-  color: rgba(253, 250, 244, 0.78);
-}
-
-footer {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 20px 8px 4px;
-  text-align: center;
-  color: var(--muted);
-}
-
-/* ─── Responsive ──────────────────────────────────────────── */
-
-@media (max-width: 1180px) {
-  .planner-layout,
-  .city-risk-layout,
-  .fleet-layout {
-    grid-template-columns: 1fr;
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-@media (max-width: 860px) {
-  .route-card-grid {
-    grid-template-columns: 1fr;
-  }
+/* Accessibility Focus Rings */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
 }
 
-@media (max-width: 720px) {
+/* Mobile Responsive */
+@media (max-width: 768px) {
   .app-shell {
-    padding: 12px;
+    flex-direction: column-reverse;
   }
 
-  .app-header,
-  .fleet-hero {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .app-header {
-    min-height: auto;
-    padding: 20px;
-  }
-
-  .brand-block {
-    align-items: flex-start;
+  .dock {
+    width: 100%;
+    height: 56px;
+    flex-direction: row;
+    justify-content: space-around;
+    border-right: none;
+    border-top: 1px solid var(--hairline);
+    padding: 0 16px;
   }
 
   .brand-mark {
-    width: 50px;
-    height: 50px;
-    border-radius: 15px;
+    display: none;
   }
 
-  .header-metrics {
-    justify-content: flex-start;
-  }
-
-  .tabs {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 18px;
-  }
-
-  .tabs button {
-    white-space: nowrap;
-  }
-
-  .control-panel,
-  .right-rail,
-  .main-dashboard,
-  .city-side-panel,
-  .fleet-card,
-  .fleet-hero {
-    border-radius: var(--radius-md);
-  }
-
-  .map {
-    height: 370px;
-  }
-
-  .map-legend {
-    left: 12px;
-    right: 12px;
-    justify-content: center;
-    border-radius: 16px;
-  }
-
-  .recommendation-banner {
-    align-items: flex-start;
-  }
-
-  .recommendation-grid,
-  .route-metrics,
-  .mode-grid {
+  .ui-layer {
+    position: absolute;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+    max-height: calc(100vh - 56px);
     grid-template-columns: 1fr;
+    overflow-y: auto;
+    padding-top: 40vh; /* Expose map at the top */
+    /* Add a subtle fade so the bottom panels look like a continuous scrolling sheet */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Override desktop column spans */
+  .col-span-3, .col-span-4, .col-span-6, .col-span-8, .col-span-9 {
+    grid-column: 1 / -1;
+  }
+
+  /* Give panels a slight shadow on mobile so they pop over the map */
+  .panel {
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.04);
   }
 }

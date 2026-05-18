@@ -1,5 +1,4 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Bike, Clock3, MapPinned, TrendingDown, Users } from 'lucide-react'
 
 const riders = [
   { name: 'R-104', dose: 612 },
@@ -13,60 +12,89 @@ const hotspots = ['Outer Ring Road', 'Silk Board', 'Marathahalli', 'Whitefield M
 
 export function FleetDashboard() {
   return (
-    <div className="fleet-layout">
-      <section className="fleet-hero">
+    <>
+      <section className="panel col-span-3">
         <div>
-          <p className="eyebrow">B2B fleet demo</p>
-          <h2>Shift planning that lowers rider UV dose</h2>
+          <p className="label">B2B fleet demo</p>
+          <h2>Shift planning</h2>
         </div>
-        <div className="fleet-stat-row">
-          <span><Users size={21} /> <strong>128</strong> delivery riders</span>
-          <span><Bike size={21} /> <strong>286</strong> avg UVI-min / shift</span>
-          <span><TrendingDown size={21} /> <strong>31%</strong> simulated reduction</span>
+        
+        <div className="data-list">
+          <div className="data-list-item">
+            <span className="label">Delivery riders</span>
+            <span className="tabular" style={{ fontWeight: 500 }}>128</span>
+          </div>
+          <div className="data-list-item">
+            <span className="label">Avg dose / shift</span>
+            <span className="tabular" style={{ fontWeight: 500 }}>286 UVI-m</span>
+          </div>
+          <div className="data-list-item">
+            <span className="label">Simulated reduction</span>
+            <span className="tabular" style={{ fontWeight: 500, color: 'var(--moss)' }}>-31%</span>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--hairline)' }}>
+          <h3>Simulation insight</h3>
+          <p style={{ fontSize: '0.875rem', marginTop: '8px' }}>
+            Shifting 1-hour delivery window reduces fleet UV dose by 31%. 
+            Compares current dispatch peaks against a cooler 10:30 AM and 4:30 PM split window.
+          </p>
         </div>
       </section>
 
-      <section className="fleet-card chart-card">
-        <div className="card-heading">
-          <Clock3 size={20} />
-          <div>
-            <p className="eyebrow">Top 5 high-exposure riders</p>
-            <h3>Daily UV dose by rider</h3>
-          </div>
+      <section className="panel col-span-6">
+        <div>
+          <p className="label">Exposure</p>
+          <h2>Daily UV dose by rider</h2>
         </div>
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={riders}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#dbe4df" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="dose" radius={[8, 8, 0, 0]} fill="#ef4444" />
-          </BarChart>
-        </ResponsiveContainer>
+        <div style={{ flex: 1, minHeight: '300px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={riders} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+              <CartesianGrid vertical={false} stroke="#E4E2DC" />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#5C5C58', fontSize: 12, fontFamily: 'monospace' }} 
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#5C5C58', fontSize: 12, fontFamily: 'monospace' }} 
+              />
+              <Tooltip 
+                cursor={{ fill: '#f4f4f0' }} 
+                contentStyle={{ borderRadius: '2px', border: '1px solid #1B1B1A', boxShadow: 'none' }} 
+              />
+              <Bar 
+                dataKey="dose" 
+                fill="transparent" 
+                stroke="#D6362A" 
+                strokeWidth={1} 
+                radius={[0, 0, 0, 0]} 
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </section>
 
-      <section className="fleet-card hotspots-card">
-        <div className="card-heading">
-          <MapPinned size={20} />
-          <div>
-            <p className="eyebrow">Hotspot corridors</p>
-            <h3>Where riders overexpose</h3>
-          </div>
+      <section className="panel col-span-3">
+        <div>
+          <p className="label">Corridors</p>
+          <h2>Overexposure hotspots</h2>
         </div>
-        {hotspots.map((hotspot, index) => (
-          <div className="hotspot-row" key={hotspot}>
-            <span>{index + 1}</span>
-            <strong>{hotspot}</strong>
-            <i style={{ width: `${96 - index * 12}%` }} />
-          </div>
-        ))}
+        
+        <div className="data-list danger">
+          {hotspots.map((hotspot, index) => (
+            <div className="data-list-item" key={hotspot}>
+              <span className="rank tabular">{index + 1}</span>
+              <span className="name">{hotspot}</span>
+            </div>
+          ))}
+        </div>
       </section>
-
-      <section className="fleet-card simulation-card">
-        <TrendingDown size={28} />
-        <h3>Shifting 1-hour delivery window reduces fleet UV dose by 31%.</h3>
-        <p>Mock simulation compares current dispatch peaks against a cooler 10:30 AM and 4:30 PM split window.</p>
-      </section>
-    </div>
+    </>
   )
 }

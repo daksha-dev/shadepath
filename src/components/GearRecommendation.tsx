@@ -1,4 +1,3 @@
-import { Droplets, Glasses, ShieldPlus, Shirt } from 'lucide-react'
 import { modeLabels, type Mode } from '../data/bangaloreRoutes'
 import type { ScoredRoute } from '../utils/routeScoring'
 import type { UserProfile } from '../utils/uvDose'
@@ -16,24 +15,31 @@ export function GearRecommendation({ route, mode, profile }: Props) {
   const needsVisor = route.peakEffectiveUv > 4.5 || !profile.helmet
 
   return (
-    <section className="insight-card gear-card">
-      <div className="card-heading">
-        <ShieldPlus size={20} />
-        <div>
-          <p className="eyebrow">Gear recommendation</p>
-          <h3>Peak effective UVI {route.peakEffectiveUv.toFixed(1)}</h3>
-        </div>
+    <section className="panel">
+      <div>
+        <p className="label">Gear recommendation</p>
+        <h2>Peak UVI {route.peakEffectiveUv.toFixed(1)}</h2>
       </div>
-      <p className="recommendation-copy">
-        Peak effective UVI is {route.peakEffectiveUv.toFixed(1)} during a {Math.round(route.etaMinutes)}-minute{' '}
-        {modeLabels[mode].toLowerCase()} ride. Use SPF {spf}, {needsSleeves ? 'long sleeves' : 'current sleeves are ok'},
-        {needsVisor ? ' UV visor or sunglasses' : ' helmet visor'}, and {hydration} ml hydration.
+      <p style={{ fontSize: '0.875rem' }}>
+        For a {Math.round(route.etaMinutes)}-minute {modeLabels[mode].toLowerCase()} ride.
       </p>
-      <div className="recommendation-grid">
-        <span><ShieldPlus size={16} /> SPF {Math.max(spf, profile.sunscreenSpf)}</span>
-        <span><Shirt size={16} /> {needsSleeves ? 'Long sleeves' : 'Sleeves set'}</span>
-        <span><Glasses size={16} /> UV visor</span>
-        <span><Droplets size={16} /> {hydration} ml</span>
+      
+      <div className="data-grid">
+        <div className="data-block">
+          <p className="label">SPF needed</p>
+          <div className="value tabular">{Math.max(spf, profile.sunscreenSpf)}</div>
+        </div>
+        <div className="data-block">
+          <p className="label">Hydration</p>
+          <div className="value tabular">{hydration}ml</div>
+        </div>
+        <div className="data-block col-span-2">
+          <p className="label">Equipment</p>
+          <div style={{ fontSize: '0.875rem' }}>
+            {needsSleeves ? 'Long sleeves, ' : ''}
+            {needsVisor ? 'UV visor' : 'Helmet visor'}
+          </div>
+        </div>
       </div>
     </section>
   )

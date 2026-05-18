@@ -1,4 +1,3 @@
-import { CalendarDays, Flame, ShieldCheck, TimerReset } from 'lucide-react'
 import type { ScoredRoute } from '../utils/routeScoring'
 
 type Props = {
@@ -12,18 +11,24 @@ export function ExposureTracker({ route, safestOffset }: Props) {
   const streak = Math.max(4, Math.round(6 + route.exposureSavedPercent / 14))
 
   return (
-    <section className="insight-card tracker-card">
-      <div className="card-heading">
-        <ShieldCheck size={20} />
-        <div>
-          <p className="eyebrow">Exposure saved tracker</p>
-          <h3>{avoided} UVI-min avoided today</h3>
-        </div>
+    <section className="panel">
+      <div>
+        <p className="label">Exposure tracker</p>
+        <h2>{avoided} UVI-min avoided today</h2>
       </div>
-      <div className="tracker-grid">
-        <span><CalendarDays size={17} /> <strong>{weekly}</strong> weekly saved</span>
-        <span><Flame size={17} /> <strong>{streak} days</strong> streak</span>
-        <span><TimerReset size={17} /> <strong>{safestOffset === 0 ? 'Now' : `+${safestOffset} min`}</strong> safest departure</span>
+      <div className="data-grid">
+        <div className="data-block safe">
+          <p className="label">Weekly saved</p>
+          <div className="value tabular">{weekly}</div>
+        </div>
+        <div className="data-block safe">
+          <p className="label">Streak</p>
+          <div className="value tabular">{streak} days</div>
+        </div>
+        <div className="data-block col-span-2">
+          <p className="label">Safest departure</p>
+          <div className="value tabular">{safestOffset === 0 ? 'Now' : `+${safestOffset}m`}</div>
+        </div>
       </div>
     </section>
   )
